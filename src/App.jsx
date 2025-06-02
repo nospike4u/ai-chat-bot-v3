@@ -59,7 +59,7 @@ function App() {
             </a>
             <img
               className="hidden object-cover w-10 h-10 mx-4 rounded-full sm:block"
-              src="src/assets/Black and White Headshot 2.png"
+              src="../src/assets/Black and White Headshot 2.png"
               alt="avatar"
             ></img>
             <a

@@ -6,7 +6,7 @@ const WeatherApi = ({ setWeatherData, weatherData }) => {
   const getWeatherData = async () => {
     try {
       const res = await axios.get(
-        `http://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=48.8567,2.3508`
+        `http://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=Germany`
       );
 
       setWeatherData(`${res.data.current.temp_c}°C`);

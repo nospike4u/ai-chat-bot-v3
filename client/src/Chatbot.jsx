@@ -7,26 +7,25 @@ const MyChatBot = () => {
 
   const sendMessage = async () => {
     if (!message.trim()) return;
+    console.log("Before sending request...");
 
     const newUserMessage = {
       sender: "User",
       text: message,
     };
-
+    
     setChatHistory((prev) => [...prev, newUserMessage]);
     setMessage("");
-
+    
     try {
       console.log("Sending request...");
       const response = await axios.post(
-        "http://localhost:5000/api/v1/ai-chat-bot/",
+        `http://localhost:8000/api/v3/ai-chat-bot`,
         { message }
       );
       
-      console.log("AI response data:", response.data.reply.choices[0].message.content);
-      const aiReply =
-      response.data.reply.choices[0].message.content ||
-      "No reply available";
+      console.log("AI response data:", response.data.completion);
+      const aiReply = response.data.completion || "No reply available";
 
       setChatHistory((prev) => [...prev, { sender: "Dom Bot", text: aiReply }]);
     } catch (error) {

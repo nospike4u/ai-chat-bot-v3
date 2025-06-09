@@ -18,18 +18,18 @@ app.get("/", (req, res) => {
   res.send("Checking server");
 });
 
-app.get("/api/v1/ai-chat-bot/", (req, res) => {
-  res.json({ message: "Hello from the backend!" });
-});
+// app.get("/api/v3/ai-chat-bot/", (req, res) => {
+//   res.json({ message: "Hello from the backend!" });
+// });
 
-app.post("/api/v1/ai-chat-bot/", async (req, res) => {
+app.post("/api/v3/ai-chat-bot/", async (req, res) => {
   try {
     const { message } = req.body;
     if (!message) {
       return res.status(400).json({ error: "Message is required." });
     }
 
-    const response = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         { role: "assistant", content: "You are a helpful assistant." },
@@ -37,11 +37,12 @@ app.post("/api/v1/ai-chat-bot/", async (req, res) => {
       ],
     });
 
-    const aiReply = response.reply;
-    console.log("AI Reply:", aiReply);
-    res.json({ reply: aiReply });
+    const aiReply = completion.choices[0].message.content;
+
+    console.log("AI Reply:", completion.choices[0].message.content);
+    res.json({ completion: aiReply });
   } catch (error) {
-    console.log("Error", error);
+    console.log("Error:", error.reply ? error.reply.data : error);
     res.status(500).json({ error: "Something went wrong!" });
   }
 });
@@ -49,14 +50,20 @@ app.post("/api/v1/ai-chat-bot/", async (req, res) => {
 const WEATHER_API_URL = process.env.WEATHER_API_URL;
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
-app.get("/api/v1/ai-chat-bot/weather/:city/", async (req, res) => {
+app.get("/api/v3/ai-chat-bot/", async (req, res) => {
   try {
-    const city = req.params.city;
+    const city = req.query.city || "Islamabad";
+
+    // console.log("Requested city:", city);
+
 
     const response = await axios.get(
-      `${WEATHER_API_URL}?key=${WEATHER_API_KEY}&q=city`
-    );
-    res.json(response.data);
+      `${WEATHER_API_URL}current.json?key=${WEATHER_API_KEY}&q=${city}`
+      );
+    
+    const temperature = response.data.current.temp_c;
+    res.json({ temperature: temperature });
+    
   } catch (error) {
     console.error("Error fetching weather data:", error.message);
     res.status(500).json({ error: "Unable to fetch weather data." });

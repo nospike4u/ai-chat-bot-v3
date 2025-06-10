@@ -26,10 +26,14 @@ const Weather = ({
       setWeatherData(`${temperature}`);
       console.log(`The current temperature is ${temperature}`);
 
-      if (temperature < 26) {
+      if (temperature <= 0) {
         setWeatherImage("src/assets/snowflake.png");
-      } else {
+      }
+      if (temperature > 0 && temperature < 15) {
         setWeatherImage("src/assets/partly_cloudy.png");
+      }
+      if (temperature > 15) {
+        setWeatherImage("src/assets/sun.png");
       }
     } catch (error) {
       console.log("Fetching failed", error);

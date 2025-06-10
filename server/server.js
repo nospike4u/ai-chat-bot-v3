@@ -25,6 +25,22 @@ app.get("/", (req, res) => {
 app.post("/api/v3/ai-chat-bot/", async (req, res) => {
   try {
     const { message } = req.body;
+
+    const city = req.query.city || "Islamabad";
+    let weatherInfo = "";
+
+    if (message.toLowerCase().includes("weather") || message.toLowerCase().includes("temperature")) {
+      
+      const weatherResponse = await axios.get(
+      `${WEATHER_API_URL}current.json?key=${WEATHER_API_KEY}&q=${city}`
+      );
+      weatherInfo = `The current temperature in ${city} is ${weatherResponse.data.current.temp_c}°C.`;
+    }
+
+        const chatPrompt = weatherInfo
+      ? `${message} Also, here's the latest weather update: ${weatherInfo}`
+      : message;
+
     if (!message) {
       return res.status(400).json({ error: "Message is required." });
     }
@@ -33,7 +49,7 @@ app.post("/api/v3/ai-chat-bot/", async (req, res) => {
       model: "gpt-4o",
       messages: [
         { role: "assistant", content: "You are a helpful assistant." },
-        { role: "user", content: message },
+        { role: "user", content: chatPrompt },
       ],
     });
 

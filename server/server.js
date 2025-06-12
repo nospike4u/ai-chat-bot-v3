@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import OpenAI from "openai";
 import axios from "axios";
+import multer from "multer";
+import fs from "fs";
 
 const app = express();
 dotenv.config();
@@ -21,6 +23,8 @@ app.get("/", (req, res) => {
 // app.get("/api/v3/ai-chat-bot/", (req, res) => {
 //   res.json({ message: "Hello from the backend!" });
 // });
+
+// -------------------------CHATBOT-------------------------------
 
 app.post("/api/v3/ai-chat-bot/", async (req, res) => {
   try {
@@ -63,6 +67,9 @@ app.post("/api/v3/ai-chat-bot/", async (req, res) => {
   }
 });
 
+
+// -------------------------WEATHER API-------------------------------
+
 const WEATHER_API_URL = process.env.WEATHER_API_URL;
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
@@ -84,6 +91,30 @@ app.get("/api/v3/ai-chat-bot/", async (req, res) => {
     console.error("Error fetching weather data:", error.message);
     res.status(500).json({ error: "Unable to fetch weather data." });
   }
+});
+
+// -------------------------IMAGE UPLOAD-------------------------------
+
+const path = "./uploads/";
+if (!fs.existsSync(path)) {
+  fs.mkdirSync(path);
+}
+
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+
+const upload = multer({ storage });
+
+app.use('/uploads', express.static('uploads'));
+
+app.post('/uploads', upload.single('image'), (req, res) => {
+  res.json({ 
+    imageUrl: `http://localhost:8000/uploads/${req.file.filename}`, 
+    message: `/uploads/${req.file.filename}` });
 });
 
 const PORT = process.env.PORT;
